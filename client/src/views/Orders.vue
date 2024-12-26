@@ -250,18 +250,19 @@ const formatDate = (dateString) => {
 
 const fetchOrders = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/api/orders/my-orders', {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/orders/my-orders`, {
       headers: { Authorization: `Bearer ${store.state.auth.token}` }
-    })
-    allOrders.value = response.data.data || []
-    orders.value = allOrders.value
+    });
+    allOrders.value = response.data.data || [];
+    orders.value = allOrders.value;
   } catch (error) {
-    console.error('獲取訂單失敗:', error)
-    ElMessage.error('獲取訂單失敗')
-    allOrders.value = []
-    orders.value = []
+    console.error('獲取訂單失敗:', error);
+    ElMessage.error('獲取訂單失敗');
+    allOrders.value = [];
+    orders.value = [];
   }
-}
+};
+
 
 const cancelOrder = async (orderId) => {
   try {
@@ -276,10 +277,11 @@ const cancelOrder = async (orderId) => {
     )
 
     const response = await axios.put(
-        `http://localhost:3000/api/orders/${orderId}/cancel`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
-    )
+    );
+
 
     if (response.data.success) {
       ElMessage.success('訂單已取消')
@@ -306,17 +308,19 @@ const confirmDelivery = async (orderId) => {
 
     // 確保 URL 格式正確
     const response = await axios.put(
-        `http://localhost:3000/api/orders/${orderId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/status`,
         {
           status: 'delivered'
         },
         {
           headers: {
-            'Authorization': `Bearer ${store.state.auth.token}`,
+            Authorization: `Bearer ${store.state.auth.token}`,
             'Content-Type': 'application/json'
           }
         }
-    )
+    );
+
+
 
     // 檢查響應
     if (response.data.success) {
@@ -350,10 +354,11 @@ const confirmCompletion = async (orderId) => {
     )
 
     await axios.put(
-        `http://localhost:3000/api/orders/${orderId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/status`,
         { status: 'completed' },
         { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
-    )
+    );
+
 
     ElMessage.success('訂單已完成')
     await fetchOrders()
@@ -377,10 +382,11 @@ const requestReturn = async (orderId) => {
     )
 
     const response = await axios.put(
-        `http://localhost:3000/api/orders/${orderId}/return`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/return`,
         {},
         { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
-    )
+    );
+
 
     if (response.data.success) {
       ElMessage.success('退貨申請已提交，客服人員將盡快與您聯繫')

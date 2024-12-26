@@ -220,7 +220,7 @@ const sendCode = async () => {
   }
 
   try {
-    await axios.post('http://localhost:3000/api/auth/send-code', {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/send-code`, {
       email: registerForm.email
     })
     ElMessage.success('驗證碼已發送到您的信箱')

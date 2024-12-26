@@ -142,23 +142,24 @@ export default {
     // 發送驗證碼
     const sendVerificationCode = async () => {
       if (!isValidEmail.value) {
-        errorMessage.value = '請輸入有效的電子郵件格式'
-        return
+        errorMessage.value = '請輸入有效的電子郵件格式';
+        return;
       }
 
       try {
-        isLoading.value = true
-        const response = await axios.post('http://localhost:3000/api/auth/forgot-password', {
+        isLoading.value = true;
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, {
           email: email.value
-        })
-        errorMessage.value = ''
-        step.value = 2
+        });
+        errorMessage.value = '';
+        step.value = 2;
       } catch (error) {
-        errorMessage.value = error.response?.data?.message || '發送驗證碼失敗'
+        errorMessage.value = error.response?.data?.message || '發送驗證碼失敗';
       } finally {
-        isLoading.value = false
+        isLoading.value = false;
       }
-    }
+    };
+
 
     // 驗證碼確認
     const verifyCode = async () => {
@@ -170,11 +171,11 @@ export default {
       try {
         isLoading.value = true
         // 這裡發送一個請求來確認驗證碼是否存在且正確
-        const response = await axios.post('http://localhost:3000/api/auth/reset-password', {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password`, {
           email: email.value,
           code: verificationCode.value,
           checkOnly: true  // 只檢查驗證碼，不重設密碼
-        })
+        });
         errorMessage.value = ''
         step.value = 3
       } catch (error) {
@@ -192,11 +193,11 @@ export default {
 
       try {
         isLoading.value = true
-        await axios.post('http://localhost:3000/api/auth/reset-password', {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password`, {
           email: email.value,
           code: verificationCode.value,
-          newPassword: newPassword.value
-        })
+          checkOnly: true  // 只檢查驗證碼，不重設密碼
+        });
 
         step.value = 4
         errorMessage.value = ''

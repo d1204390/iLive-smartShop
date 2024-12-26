@@ -328,7 +328,7 @@ const totalAmount = computed(() => {
 // 獲取常用地址
 const fetchAddresses = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/api/addresses')
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/addresses`);
     savedAddresses.value = response.data.data
   } catch (error) {
     console.error('獲取地址失敗:', error)
