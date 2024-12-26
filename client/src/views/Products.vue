@@ -342,6 +342,12 @@ onMounted(() => {
   grid-template-columns: 280px 1fr;
   gap: 24px;
   align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
 }
 
 .search-box :deep(.el-input) {
