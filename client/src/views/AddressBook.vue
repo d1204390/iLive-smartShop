@@ -197,13 +197,14 @@ const addressRules = {
 // 獲取地址列表
 const fetchAddresses = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/api/addresses')
-    addresses.value = response.data.data
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/addresses`);
+    addresses.value = response.data.data;
   } catch (error) {
-    ElMessage.error('獲取地址列表失敗')
-    console.error('獲取地址失敗:', error)
+    ElMessage.error('獲取地址列表失敗');
+    console.error('獲取地址失敗:', error);
   }
-}
+};
+
 
 // 處理地址表單提交
 const handleAddressSubmit = async () => {
@@ -215,17 +216,18 @@ const handleAddressSubmit = async () => {
 
     if (editingAddress.value) {
       await axios.put(
-          `http://localhost:3000/api/addresses/${editingAddress.value._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/addresses/${editingAddress.value._id}`,
           addressForm.value
-      )
-      ElMessage.success('地址更新成功')
+      );
+      ElMessage.success('地址更新成功');
     } else {
       await axios.post(
-          'http://localhost:3000/api/addresses',
+          `${import.meta.env.VITE_API_BASE_URL}/addresses`,
           addressForm.value
-      )
-      ElMessage.success('地址新增成功')
+      );
+      ElMessage.success('地址新增成功');
     }
+
 
     await fetchAddresses()
     closeAddressForm()
@@ -266,13 +268,14 @@ const confirmDelete = async (addressId) => {
 // 刪除地址
 const deleteAddress = async (addressId) => {
   try {
-    await axios.delete(`http://localhost:3000/api/addresses/${addressId}`)
-    ElMessage.success('地址已刪除')
-    await fetchAddresses()
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/addresses/${addressId}`);
+    ElMessage.success('地址已刪除');
+    await fetchAddresses();
   } catch (error) {
-    ElMessage.error('刪除地址失敗')
+    ElMessage.error('刪除地址失敗');
   }
-}
+};
+
 
 // 關閉地址表單
 const closeAddressForm = (done) => {

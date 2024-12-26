@@ -101,11 +101,11 @@ const store = createStore({
         // 註冊
         async register({ commit }, credentials) {
             try {
-                const { data } = await axios.post('http://localhost:3000/api/auth/register', credentials)
-                commit('SET_AUTH', { token: data.token, user: data.user })
-                return data
+                const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, credentials);
+                commit('SET_AUTH', { token: data.token, user: data.user });
+                return data;
             } catch (error) {
-                throw error.response?.data || error
+                throw error.response?.data || error;
             }
         },
         // 登出
@@ -116,7 +116,7 @@ const store = createStore({
         // 獲取產品列表
         async fetchProducts({ commit }) {
             try {
-                const { data } = await axios.get('http://localhost:3000/api/products')
+                const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
                 const products = Array.isArray(data) ? data : (data.data || [])
                 commit('SET_PRODUCTS', products)
                 return products
@@ -127,7 +127,7 @@ const store = createStore({
         // 獲取訂單列表
         async fetchOrders({ commit, state }) {
             try {
-                const response = await axios.get('http://localhost:3000/api/orders/my-orders', {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/orders/my-orders`, {
                     headers: { Authorization: `Bearer ${state.auth.token}` }
                 });
                 const orders = response.data.success ? response.data.data : response.data;
@@ -151,9 +151,9 @@ const store = createStore({
         },
         async cancelOrder({ state }, orderId) {
             try {
-                await axios.put(`http://localhost:3000/api/orders/${orderId}/cancel`, null, {
+                await axios.put(`${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/cancel`, null, {
                     headers: { Authorization: `Bearer ${state.auth.token}` }
-                })
+                });
             } catch (error) {
                 throw error.response?.data || error
             }
@@ -161,7 +161,7 @@ const store = createStore({
         // 創建訂單
         async createOrder({ state, commit }, orderData) {
             try {
-                const response = await axios.post('http://localhost:3000/api/orders', orderData, {
+                const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
                     headers: { Authorization: `Bearer ${state.auth.token}` }
                 });
 

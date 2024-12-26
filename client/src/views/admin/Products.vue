@@ -413,11 +413,11 @@ export default {
     const fetchProducts = async () => {
       try {
         loading.value = true
-        const response = await fetch('http://localhost:3000/api/products/admin', {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/admin`, {
           headers: {
             'Authorization': `Bearer ${store.state.auth.token}`
           }
-        })
+        });
         const result = await response.json()
 
         if (result.success === false) {
@@ -458,7 +458,7 @@ export default {
 
     const toggleProductStatus = async (product) => {
       try {
-        await fetch(`http://localhost:3000/api/products/${product._id}`, {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/${product._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -467,7 +467,7 @@ export default {
           body: JSON.stringify({
             isActive: !product.isActive
           })
-        })
+        });
         await fetchProducts()
         ElMessage.success(product.isActive ? '商品已下架' : '商品已上架')
       } catch (error) {
@@ -478,19 +478,20 @@ export default {
 
     const deleteProduct = async (productId) => {
       try {
-        await fetch(`http://localhost:3000/api/products/${productId}`, {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/${productId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${store.state.auth.token}`
           }
-        })
-        await fetchProducts()
-        ElMessage.success('商品已刪除')
+        });
+        await fetchProducts();
+        ElMessage.success('商品已刪除');
       } catch (error) {
-        console.error('刪除商品失敗:', error)
-        ElMessage.error('刪除失敗')
+        console.error('刪除商品失敗:', error);
+        ElMessage.error('刪除失敗');
       }
-    }
+    };
+
 
     const handleSubmit = async () => {
       if (!productForm.value) return;
@@ -518,8 +519,9 @@ export default {
         console.log('處理後的數據:', productData);
 
         const url = editingProduct.value
-            ? `http://localhost:3000/api/products/${editingProduct.value._id}`
-            : 'http://localhost:3000/api/products';
+            ? `${import.meta.env.VITE_API_BASE_URL}/products/${editingProduct.value._id}`
+            : `${import.meta.env.VITE_API_BASE_URL}/products`;
+
 
         console.log('請求URL:', url);
 

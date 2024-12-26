@@ -157,11 +157,12 @@ export default {
         loading.value = true;
         error.value = null;
 
-        const response = await axios.get('http://localhost:3000/api/orders/statistics', {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/orders/statistics`, {
           headers: {
             Authorization: `Bearer ${store.state.auth.token}`
           }
         });
+
 
         if (response.data?.success) {
           salesData.value = response.data.data;

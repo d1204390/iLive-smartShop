@@ -275,10 +275,9 @@ export default {
     const fetchDashboardData = async () => {
       loading.value = true
       try {
-        const { data } = await axios.get('http://localhost:3000/api/admin/dashboard', {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard`, {
           headers: { Authorization: `Bearer ${store.state.auth.token}` }
-        })
-
+        });
         // 批量更新數據以減少重渲染
         orderStats.value = {
           total: data?.orderStats?.total || 0,
