@@ -144,9 +144,10 @@
           <router-view></router-view>
         </el-main>
 
-        <el-footer height="340px" class="site-footer">
+        <el-footer height="auto" class="site-footer">
           <div class="footer-content">
-            <div class="footer-sections">
+            <!-- 電腦版完整資訊 -->
+            <div class="footer-sections desktop-footer">
               <div class="footer-section">
                 <h3>關於我們</h3>
                 <p>iLive智慧家電購物網站提供優質的智能家電產品，讓您的生活更加便利舒適。</p>
@@ -172,6 +173,18 @@
                   <li><a href="/privacy-policy">隱私政策</a></li>
                   <li><a href="/terms">使用條款</a></li>
                 </ul>
+              </div>
+            </div>
+
+            <!-- 手機版簡化資訊 -->
+            <div class="footer-sections mobile-footer">
+              <div class="footer-section">
+                <h3>聯絡我們</h3>
+                <p>客服專線：(02) 1234-5678</p>
+                <a href="mailto:service@ilive.com" class="contact-link">
+                  <el-icon><Message /></el-icon>
+                  聯絡客服
+                </a>
               </div>
             </div>
 
@@ -206,7 +219,7 @@ import {
   List,
   User,
   ShoppingCart,
-  TrendCharts,Menu
+  TrendCharts,Menu,Message
 } from '@element-plus/icons-vue'
 
 const store = useStore()
@@ -642,6 +655,62 @@ header.el-header.client-header {
 @media screen and (max-width: 768px) {
   .mobile-menu-toggle {
     display: block;
+  }
+}
+
+/* 新增手機版 footer 樣式 */
+.mobile-footer {
+  display: none;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: var(--el-color-primary);
+  border-radius: 4px;
+  margin-top: 12px;
+  color: white;
+  text-decoration: none;
+}
+
+.contact-link .el-icon {
+  font-size: 18px;
+}
+
+@media screen and (max-width: 768px) {
+  .site-footer {
+    padding: 24px 0;
+  }
+
+  .desktop-footer {
+    display: none;
+  }
+
+  .mobile-footer {
+    display: block;
+    padding: 0 16px;
+  }
+
+  .mobile-footer .footer-section {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .mobile-footer h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .mobile-footer p {
+    margin-bottom: 8px;
+  }
+
+  .footer-bottom {
+    padding-top: 16px;
+    margin-top: 16px;
   }
 }
 
