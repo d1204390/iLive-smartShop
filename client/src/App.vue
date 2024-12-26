@@ -3,7 +3,12 @@
     <!-- 管理後台導航列 -->
     <template v-if="isAdminRoute">
       <el-container>
-        <el-aside v-if="isAuthenticated" width="240px" class="admin-aside">
+        <el-aside
+            v-if="isAuthenticated"
+            width="240px"
+            class="admin-aside"
+            :class="{ 'show': showMobileMenu }"
+        >
           <div class="logo-container">
             <h1>iLive智慧家電</h1>
           </div>
@@ -40,6 +45,11 @@
 
         <el-container>
           <el-header class="admin-header">
+            <!-- 手機版選單切換按鈕 -->
+            <div class="mobile-menu-toggle" @click="toggleMobileMenu">
+              <el-icon size="24"><Menu /></el-icon>
+            </div>
+
             <div class="header-right">
               <el-dropdown v-if="isAuthenticated" @command="handleCommand">
                 <span class="user-profile">
@@ -76,10 +86,16 @@
               </router-link>
             </div>
 
+            <!-- 手機版選單切換按鈕 -->
+            <div class="mobile-menu-toggle" @click="toggleMobileMenu">
+              <el-icon size="24"><Menu /></el-icon>
+            </div>
+
             <el-menu
                 mode="horizontal"
                 :router="true"
                 class="main-menu"
+                :class="{ 'mobile-menu': showMobileMenu }"
                 :ellipsis="false"
             >
               <el-menu-item index="/">首頁</el-menu-item>
@@ -87,7 +103,7 @@
               <el-menu-item index="/promotions">優惠活動</el-menu-item>
             </el-menu>
 
-            <div class="user-actions">
+            <div class="user-actions" :class="{ 'mobile-user-actions': showMobileMenu }">
               <img src="/iLive.jpg" alt="iLive Logo" class="logo-image" />
               <template v-if="!isAuthenticated">
                 <router-link to="/login">
@@ -166,15 +182,6 @@
         </el-footer>
       </el-container>
     </template>
-    <div
-        v-if="showTopButton"
-        class="top-button"
-        @click="scrollToTop">
-      TOP
-    </div>
-  </div>
-</template>
-
 
 <script setup>
 import { computed } from 'vue'
@@ -187,19 +194,35 @@ import {
   List,
   User,
   ShoppingCart,
-  TrendCharts
+  TrendCharts,Menu
 } from '@element-plus/icons-vue'
 
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
 const showTopButton = ref(false)
+const isMobileMenuOpen = ref(false)
+const showMobileMenu = ref(false)
+
+
 
 const isAuthenticated = computed(() => !!store.state.auth.token)
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const activeMenu = computed(() => route.path)
 const cartCount = computed(() => store.state.cart?.length || 0)
 
+
+// 添加切換行動選單的方法
+const toggleMobileMenu = () => {
+  showMobileMenu.value = !showMobileMenu.value
+}
+
+// 監聽視窗寬度變化
+const handleResize = () => {
+  if (window.innerWidth > 768) {
+    showMobileMenu.value = false
+  }
+}
 
 const handleCommand = (command) => {
   switch (command) {
@@ -237,11 +260,11 @@ const scrollToTop = () => {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -466,6 +489,148 @@ header.el-header.client-header {
 
 .top-button:active {
   transform: scale(0.9);
+}
+
+/* 平板樣式 (768px ~ 1024px) */
+@media screen and (max-width: 1024px) {
+  .header-container {
+    padding: 0 16px;
+  }
+
+  .logo-text {
+    font-size: 24px;
+  }
+
+  .logo-sub {
+    font-size: 14px;
+  }
+
+  .user-actions {
+    gap: 8px;
+  }
+}
+
+/* 手機樣式 (< 768px) */
+@media screen and (max-width: 768px) {
+  .header-container {
+    position: relative;
+    padding: 0 12px;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 8px;
+  }
+
+  .main-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .main-menu.mobile-menu {
+    display: flex;
+  }
+
+  .el-menu--horizontal > .el-menu-item {
+    height: 50px;
+    line-height: 50px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .user-actions {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 16px;
+    background-color: #fff;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .user-actions.mobile-user-actions {
+    display: flex;
+  }
+
+  .cart-badge {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+
+  /* 調整購物車和會員中心按鈕樣式 */
+  .user-actions .el-button {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  /* Footer 響應式調整 */
+  .footer-sections {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 0 16px;
+  }
+
+  .footer-section {
+    text-align: center;
+  }
+
+  /* 管理後台響應式調整 */
+  .admin-aside {
+    position: fixed;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .admin-aside.show {
+    transform: translateX(0);
+  }
+
+  .el-container .el-main {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* 極小螢幕樣式 (< 480px) */
+@media screen and (max-width: 480px) {
+  .logo-text {
+    font-size: 20px;
+  }
+
+  .logo-sub {
+    display: none;
+  }
+
+  .logo-image {
+    width: 32px;
+    height: 32px;
+  }
+
+  .el-dropdown-menu {
+    min-width: 120px;
+  }
+}
+
+/* 隱藏桌機版選單開關按鈕 */
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+  }
 }
 
 </style>
