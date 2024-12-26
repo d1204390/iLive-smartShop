@@ -92,6 +92,10 @@
                   :key="item.path"
                   :to="item.path"
                   class="nav-link"
+                  @click="() => {
+                  showMobileMenu = false
+                  unlockScroll()
+                  }"
               >
                 {{ item.label }}
               </router-link>
@@ -108,13 +112,15 @@
                 </router-link>
               </template>
               <template v-else>
-                <router-link to="/cart">
-                  <el-badge :value="cartCount" class="cart-badge">
-                    <el-button text>
-                      <el-icon><ShoppingCart /></el-icon>
-                      購物車
-                    </el-button>
-                  </el-badge>
+                <router-link to="/cart" @click="() => {
+                   showMobileMenu = false
+                   unlockScroll()
+                  }">
+                  <el-button block>
+                    <el-icon><ShoppingCart /></el-icon>
+                    購物車
+                    <el-badge :value="cartCount" />
+                  </el-button>
                 </router-link>
                 <el-dropdown @command="handleCommand">
                   <el-button text>
@@ -172,10 +178,16 @@
                       <el-badge :value="cartCount" />
                     </el-button>
                   </router-link>
-                  <router-link to="/profile" @click="showMobileMenu = false">
+                  <router-link to="/profile" @click="() => {
+                            showMobileMenu = false
+                            unlockScroll()
+                    }">
                     <el-button block>個人資料</el-button>
                   </router-link>
-                  <router-link to="/orders" @click="showMobileMenu = false">
+                  <router-link to="/orders" @click="() => {
+                   showMobileMenu = false
+                   unlockScroll()
+                   }">
                     <el-button block>訂單查詢</el-button>
                   </router-link>
                   <el-button @click="handleLogout" block>登出</el-button>
@@ -224,7 +236,7 @@
               <div class="footer-section">
                 <h3>相關條款</h3>
                 <ul>
-                  <li><router-link to="/privacy">隱私政策</router-link></li>
+                  <li><router-link to="/privacy-policy">隱私政策</router-link></li>
                   <li><router-link to="/terms">使用條款</router-link></li>
                 </ul>
               </div>
@@ -340,6 +352,10 @@ const handleResize = () => {
     showMobileMenu.value = false
     document.body.style.overflow = ''
   }
+}
+
+const unlockScroll = () => {
+  document.body.style.overflow = ''
 }
 
 // Lifecycle
