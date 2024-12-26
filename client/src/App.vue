@@ -264,7 +264,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import {
@@ -360,6 +360,12 @@ const handleResize = () => {
 const unlockScroll = () => {
   document.body.style.overflow = ''
 }
+// 監聽路由變化
+watch(() => route.path, () => {
+  // 路由變化時解除滾動鎖定
+  unlockScroll()
+  showMobileMenu.value = false
+})
 
 // Lifecycle
 onMounted(() => {
