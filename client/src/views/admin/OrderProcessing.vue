@@ -86,7 +86,7 @@ export default {
         loading.value = true
 
         const response = await axios.put(
-            `http://localhost:3000/api/orders/${props.orderId}/status`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/orders/${props.orderId}/status`,
             {
               status: 'shipped',
               trackingNumber: form.trackingNumber,
@@ -95,7 +95,8 @@ export default {
             {
               headers: { Authorization: `Bearer ${store.state.auth.token}` }
             }
-        )
+        );
+
 
         if (response.data.success) {
           ElMessage.success('訂單出貨成功')

@@ -92,7 +92,7 @@ export default {
     const fetchUsers = async () => {
       loading.value = true;
       try {
-        const response = await axios.get('http://localhost:3000/api/admin/users', {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/users`, {
           headers: { Authorization: `Bearer ${store.state.auth.token}` },
         });
         users.value = response.data;
@@ -102,6 +102,7 @@ export default {
         loading.value = false;
       }
     };
+
 
     // 切換用戶狀態（啟用/停用）
     const toggleUserStatus = async (userId, isActive) => {
@@ -117,7 +118,7 @@ export default {
         );
 
         await axios.put(
-            `http://localhost:3000/api/admin/users/${userId}/status`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/admin/users/${userId}/status`,
             { isActive },
             { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
         );

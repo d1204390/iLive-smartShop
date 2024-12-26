@@ -385,7 +385,7 @@ export default {
     const fetchOrders = async () => {
       loading.value = true;
       try {
-        const response = await axios.get('http://localhost:3000/api/orders', {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/orders`, {
           headers: { Authorization: `Bearer ${store.state.auth.token}` }
         });
         orders.value = response.data.data || [];
@@ -396,6 +396,7 @@ export default {
       }
     };
 
+
     const startProcessingOrder = async (orderId) => {
       try {
         await ElMessageBox.confirm('確定要開始處理此訂單？', '提示', {
@@ -405,10 +406,11 @@ export default {
         });
 
         const response = await axios.put(
-            `http://localhost:3000/api/orders/${orderId}/status`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/status`,
             { status: 'processing' },
             { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
         );
+
 
         if (response.data.success) {
           ElMessage.success('訂單狀態已更新');
@@ -489,7 +491,7 @@ export default {
     const cancelOrder = async (orderId) => {
       try {
         const response = await axios.put(
-            `http://localhost:3000/api/orders/${orderId}/admin-cancel`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/admin-cancel`,
             {},
             { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
         );
@@ -502,6 +504,7 @@ export default {
         ElMessage.error('取消訂單失敗：' + (error.response?.data?.message || '請稍後再試'));
       }
     };
+
 
     onMounted(async () => {
       await fetchOrders();
