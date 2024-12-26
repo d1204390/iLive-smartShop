@@ -92,7 +92,7 @@ export default {
     const fetchUsers = async () => {
       loading.value = true;
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/users`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/users`, {
           headers: { Authorization: `Bearer ${store.state.auth.token}` },
         });
         users.value = response.data;
@@ -118,7 +118,7 @@ export default {
         );
 
         await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/api/admin/users/${userId}/status`,
+            `${import.meta.env.VITE_API_BASE_URL}/admin/users/${userId}/status`,
             { isActive },
             { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
         );

@@ -250,7 +250,7 @@ const formatDate = (dateString) => {
 
 const fetchOrders = async () => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/orders/my-orders`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/orders/my-orders`, {
       headers: { Authorization: `Bearer ${store.state.auth.token}` }
     });
     allOrders.value = response.data.data || [];
@@ -277,7 +277,7 @@ const cancelOrder = async (orderId) => {
     )
 
     const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/cancel`,
+        `${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
     );
@@ -308,7 +308,7 @@ const confirmDelivery = async (orderId) => {
 
     // 確保 URL 格式正確
     const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/status`,
         {
           status: 'delivered'
         },
@@ -354,7 +354,7 @@ const confirmCompletion = async (orderId) => {
     )
 
     await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/status`,
         { status: 'completed' },
         { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
     );
@@ -382,7 +382,7 @@ const requestReturn = async (orderId) => {
     )
 
     const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/return`,
+        `${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/return`,
         {},
         { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
     );

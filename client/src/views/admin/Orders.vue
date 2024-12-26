@@ -385,7 +385,7 @@ export default {
     const fetchOrders = async () => {
       loading.value = true;
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/orders`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
           headers: { Authorization: `Bearer ${store.state.auth.token}` }
         });
         orders.value = response.data.data || [];
@@ -406,7 +406,7 @@ export default {
         });
 
         const response = await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/status`,
+            `${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/status`,
             { status: 'processing' },
             { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
         );
@@ -491,7 +491,7 @@ export default {
     const cancelOrder = async (orderId) => {
       try {
         const response = await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/api/orders/${orderId}/admin-cancel`,
+            `${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}/admin-cancel`,
             {},
             { headers: { Authorization: `Bearer ${store.state.auth.token}` } }
         );

@@ -86,7 +86,7 @@ export default {
         loading.value = true
 
         const response = await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/api/orders/${props.orderId}/status`,
+            `${import.meta.env.VITE_API_BASE_URL}/orders/${props.orderId}/status`,
             {
               status: 'shipped',
               trackingNumber: form.trackingNumber,

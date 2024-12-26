@@ -148,7 +148,7 @@ export default {
 
       try {
         isLoading.value = true;
-        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/forgot-password`, {
           email: email.value
         });
         errorMessage.value = '';
@@ -171,7 +171,7 @@ export default {
       try {
         isLoading.value = true
         // 這裡發送一個請求來確認驗證碼是否存在且正確
-        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password`, {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/reset-password`, {
           email: email.value,
           code: verificationCode.value,
           checkOnly: true  // 只檢查驗證碼，不重設密碼
@@ -193,7 +193,7 @@ export default {
 
       try {
         isLoading.value = true
-        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password`, {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/reset-password`, {
           email: email.value,
           code: verificationCode.value,
           checkOnly: true  // 只檢查驗證碼，不重設密碼
