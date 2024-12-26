@@ -109,7 +109,7 @@
 
       <!-- 購物車空時顯示 -->
       <el-empty v-else description="購物車是空的">
-        <router-link to="/products">
+        <router-link to="/products?from=cart">
           <el-button type="primary">繼續購物</el-button>
         </router-link>
       </el-empty>

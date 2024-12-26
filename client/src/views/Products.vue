@@ -245,9 +245,11 @@ const fetchProducts = async () => {
 
 // 滾動到頂部
 const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
+  requestAnimationFrame(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'auto' // 改用 auto 而非 smooth
+    })
   })
 }
 
@@ -258,18 +260,20 @@ onBeforeRouteUpdate((to) => {
   if (categoryFromQuery) {
     selectedCategory.value = categoryFromQuery
   }
-  scrollToTop()
 })
 
 // 從路由參數中獲取分類
 onMounted(() => {
   fetchProducts()
-  // 如果URL中有category參數，設置選中的分類
+  // 如果 URL 中有 category 參數，設置選中的分類
   const categoryFromQuery = route.query.category
   if (categoryFromQuery) {
     selectedCategory.value = categoryFromQuery
   }
-  scrollToTop()
+  // 只在非從購物車來的情況下滾動到頂部
+  if (!route.query.from) {
+    scrollToTop()
+  }
 })
 </script>
 
