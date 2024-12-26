@@ -122,6 +122,11 @@ const routes = [
                 meta: { requiresAdmin: true }
             }
         ]
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('../views/NotFound.vue')
     }
 ]
 

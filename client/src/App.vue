@@ -1,24 +1,25 @@
 <template>
-  <div class="app-container">
-    <!-- 管理後台導航列 -->
+  <div class="app-layout">
+    <!-- 管理後台 -->
     <template v-if="isAdminRoute">
-      <el-container>
-        <el-aside
-            v-if="isAuthenticated"
-            width="240px"
-            class="admin-aside"
-            :class="{ 'show': showMobileMenu }"
-        >
-          <div class="logo-container">
-            <h1>iLive智慧家電</h1>
+      <div class="admin-layout">
+        <!-- 側邊欄切換按鈕 -->
+        <div class="sidebar-toggle" @click="toggleSidebar">
+          <el-icon><Fold v-if="sidebarOpen" /><Expand v-else /></el-icon>
+        </div>
+
+        <!-- 側邊欄 -->
+        <div class="admin-sidebar" :class="{ 'sidebar-closed': !sidebarOpen }">
+          <div class="admin-logo">
+            <img src="/iLive.jpg" alt="iLive Logo" />
+            <span v-show="sidebarOpen">iLive智慧家電</span>
           </div>
+
           <el-menu
               :default-active="activeMenu"
               class="admin-menu"
+              :collapse="!sidebarOpen"
               router
-              background-color="#2c1810"
-              text-color="#fff"
-              active-text-color="#ff9900"
           >
             <el-menu-item index="/admin/dashboard">
               <el-icon><Odometer /></el-icon>
@@ -41,20 +42,17 @@
               <span>銷量統計</span>
             </el-menu-item>
           </el-menu>
-        </el-aside>
+        </div>
 
-        <el-container>
-          <el-header class="admin-header">
-            <!-- 手機版選單切換按鈕 -->
-            <div class="mobile-menu-toggle" @click="toggleMobileMenu">
-              <el-icon size="24"><Menu /></el-icon>
-            </div>
-
-            <div class="header-right">
+        <!-- 主要內容區 -->
+        <div class="admin-main" :class="{ 'main-expanded': !sidebarOpen }">
+          <div class="admin-header">
+            <div class="header-tools">
               <el-dropdown v-if="isAuthenticated" @command="handleCommand">
-                <span class="user-profile">
-                  <el-icon><User /></el-icon>
-                  管理員
+                <span class="admin-user">
+                  <el-avatar :size="32" src="/admin-avatar.jpg" />
+                  <span>管理員</span>
+                  <el-icon><CaretBottom /></el-icon>
                 </span>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -63,48 +61,44 @@
                 </template>
               </el-dropdown>
             </div>
-          </el-header>
+          </div>
 
-          <el-main>
+          <div class="admin-content">
             <router-view></router-view>
-          </el-main>
-        </el-container>
-      </el-container>
+          </div>
+        </div>
+      </div>
     </template>
 
-    <!-- 前台導航列 -->
+    <!-- 前台 -->
     <template v-else>
-      <el-container>
-        <el-header class="client-header">
-          <div class="header-container">
-            <div class="logo">
-              <router-link to="/" class="logo-link">
-                <div class="logo-text-container">
-                  <span class="logo-text">iLive</span>
-                  <span class="logo-sub">智慧家電</span>
-                </div>
-              </router-link>
-            </div>
-
-            <!-- 手機版選單切換按鈕 -->
-            <div class="mobile-menu-toggle" @click="toggleMobileMenu">
-              <el-icon size="24"><Menu /></el-icon>
-            </div>
-
-            <el-menu
-                mode="horizontal"
-                :router="true"
-                class="main-menu"
-                :class="{ 'mobile-menu': showMobileMenu }"
-                :ellipsis="false"
-            >
-              <el-menu-item index="/">首頁</el-menu-item>
-              <el-menu-item index="/products">商品列表</el-menu-item>
-              <el-menu-item index="/promotions">優惠活動</el-menu-item>
-            </el-menu>
-
-            <div class="user-actions" :class="{ 'mobile-user-actions': showMobileMenu }">
+      <div class="client-layout">
+        <!-- 前台 Header -->
+        <header class="client-header" :class="{ 'header-shadow': isScrolled }">
+          <div class="header-content">
+            <!-- Logo區域 -->
+            <router-link to="/" class="logo-area">
               <img src="/iLive.jpg" alt="iLive Logo" class="logo-image" />
+              <div class="logo-text">
+                <span class="text-primary">iLive</span>
+                <span class="text-secondary">智慧家電</span>
+              </div>
+            </router-link>
+
+            <!-- 導航選單 (desktop) -->
+            <nav class="nav-desktop" v-show="!isMobile">
+              <router-link
+                  v-for="item in navItems"
+                  :key="item.path"
+                  :to="item.path"
+                  class="nav-link"
+              >
+                {{ item.label }}
+              </router-link>
+            </nav>
+
+            <!-- 用戶操作區 (desktop) -->
+            <div class="user-actions" v-show="!isMobile">
               <template v-if="!isAuthenticated">
                 <router-link to="/login">
                   <el-button text>登入</el-button>
@@ -131,271 +125,409 @@
                     <el-dropdown-menu>
                       <el-dropdown-item command="profile">個人資料</el-dropdown-item>
                       <el-dropdown-item command="orders">訂單查詢</el-dropdown-item>
-                      <el-dropdown-item v-if="isAuthenticated" divided command="logout">登出</el-dropdown-item>
+                      <el-dropdown-item command="logout">登出</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
               </template>
             </div>
+
+            <!-- 手機版選單按鈕 -->
+            <div class="mobile-menu-btn" v-show="isMobile" @click="toggleMobileMenu">
+              <el-icon :size="24">
+                <Close v-if="showMobileMenu" />
+                <Menu v-else />
+              </el-icon>
+            </div>
           </div>
-        </el-header>
 
-        <el-main>
+          <!-- 手機版選單 -->
+          <transition name="slide-fade">
+            <div class="mobile-menu" v-show="isMobile && showMobileMenu">
+              <nav class="nav-mobile">
+                <router-link
+                    v-for="item in navItems"
+                    :key="item.path"
+                    :to="item.path"
+                    class="nav-link"
+                    @click="showMobileMenu = false"
+                >
+                  {{ item.label }}
+                </router-link>
+              </nav>
+              <div class="mobile-user-actions">
+                <template v-if="!isAuthenticated">
+                  <router-link to="/login" @click="showMobileMenu = false">
+                    <el-button block>登入</el-button>
+                  </router-link>
+                  <router-link to="/register" @click="showMobileMenu = false">
+                    <el-button type="primary" block>註冊</el-button>
+                  </router-link>
+                </template>
+                <template v-else>
+                  <router-link to="/cart" @click="showMobileMenu = false">
+                    <el-button block>
+                      <el-icon><ShoppingCart /></el-icon>
+                      購物車
+                      <el-badge :value="cartCount" />
+                    </el-button>
+                  </router-link>
+                  <router-link to="/profile" @click="showMobileMenu = false">
+                    <el-button block>個人資料</el-button>
+                  </router-link>
+                  <router-link to="/orders" @click="showMobileMenu = false">
+                    <el-button block>訂單查詢</el-button>
+                  </router-link>
+                  <el-button @click="handleLogout" block>登出</el-button>
+                </template>
+              </div>
+            </div>
+          </transition>
+        </header>
+
+        <!-- 主要內容區 -->
+        <main class="client-main">
           <router-view></router-view>
-        </el-main>
+        </main>
 
-        <el-footer height="auto" class="site-footer">
+        <!-- Footer -->
+        <footer class="client-footer">
           <div class="footer-content">
-            <!-- 電腦版完整資訊 -->
-            <div class="footer-sections desktop-footer">
+            <div class="footer-grid">
+              <!-- 公司簡介 -->
               <div class="footer-section">
                 <h3>關於我們</h3>
                 <p>iLive智慧家電購物網站提供優質的智能家電產品，讓您的生活更加便利舒適。</p>
               </div>
 
+              <!-- 聯絡資訊 -->
               <div class="footer-section">
                 <h3>聯絡資訊</h3>
-                <p>電話：(02) 1234-5678</p>
-                <p>信箱：service@ilive.com</p>
-                <p>地址：台中市西屯區文華路100號</p>
+                <ul>
+                  <li><el-icon><Phone /></el-icon> (02) 1234-5678</li>
+                  <li><el-icon><Message /></el-icon> service@ilive.com</li>
+                  <li><el-icon><Location /></el-icon> 台中市西屯區文華路100號</li>
+                </ul>
               </div>
 
+              <!-- 服務時間 -->
               <div class="footer-section">
                 <h3>服務時間</h3>
-                <p>週一至週五：09:00-18:00</p>
-                <p>週六：10:00-17:00</p>
-                <p>週日及國定假日休息</p>
+                <ul>
+                  <li>週一至週五：09:00-18:00</li>
+                  <li>週六：10:00-17:00</li>
+                  <li>週日及國定假日休息</li>
+                </ul>
               </div>
 
+              <!-- 相關條款 -->
               <div class="footer-section">
                 <h3>相關條款</h3>
                 <ul>
-                  <li><a href="/privacy-policy">隱私政策</a></li>
-                  <li><a href="/terms">使用條款</a></li>
+                  <li><router-link to="/privacy">隱私政策</router-link></li>
+                  <li><router-link to="/terms">使用條款</router-link></li>
                 </ul>
               </div>
             </div>
 
-            <!-- 手機版簡化資訊 -->
-            <div class="footer-sections mobile-footer">
-              <div class="footer-section">
-                <h3>聯絡我們</h3>
-                <p>客服專線：(02) 1234-5678</p>
-                <a href="mailto:service@ilive.com" class="contact-link">
-                  <el-icon><Message /></el-icon>
-                  聯絡客服
-                </a>
-              </div>
-            </div>
-
+            <!-- 版權資訊 -->
             <div class="footer-bottom">
-              <p>&copy; 2024 iLive智慧家電 版權所有</p>
+              <p>&copy; {{ currentYear }} iLive智慧家電 版權所有</p>
             </div>
           </div>
-        </el-footer>
-      </el-container>
+        </footer>
+      </div>
     </template>
 
-    <div
-        v-if="showTopButton"
-        class="top-button"
-        @click="scrollToTop"
-    >
-      TOP
-    </div>
+    <!-- 回到頂部按鈕 -->
+    <transition name="fade">
+      <div v-show="showBackToTop" class="back-to-top" @click="scrollToTop">
+        <el-icon><Top /></el-icon>
+      </div>
+    </transition>
   </div>
 </template>
 
-
-
 <script setup>
-import { computed } from 'vue'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import {
-  Odometer,
-  Goods,
-  List,
-  User,
-  ShoppingCart,
-  TrendCharts,Menu,Message
+  Odometer, Goods, List, User, ShoppingCart, TrendCharts,
+  Fold, Expand, CaretBottom, Menu, Close, Phone, Message,
+  Location, Avatar, Top
 } from '@element-plus/icons-vue'
 
+// Store & Router
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
-const showTopButton = ref(false)
-const isMobileMenuOpen = ref(false)
+
+// State
+const sidebarOpen = ref(true)
 const showMobileMenu = ref(false)
+const isMobile = ref(false)
+const isScrolled = ref(false)
+const showBackToTop = ref(false)
 
-
-
+// Computed
 const isAuthenticated = computed(() => !!store.state.auth.token)
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const activeMenu = computed(() => route.path)
 const cartCount = computed(() => store.state.cart?.length || 0)
+const currentYear = computed(() => new Date().getFullYear())
 
+// 導航項目
+const navItems = [
+  { path: '/', label: '首頁' },
+  { path: '/products', label: '商品列表' },
+  { path: '/promotions', label: '優惠活動' }
+]
 
-// 添加切換行動選單的方法
-const toggleMobileMenu = () => {
-  showMobileMenu.value = !showMobileMenu.value
+// Methods
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
 }
 
-// 監聽視窗寬度變化
-const handleResize = () => {
-  if (window.innerWidth > 768) {
-    showMobileMenu.value = false
+const toggleMobileMenu = () => {
+  showMobileMenu.value = !showMobileMenu.value
+  if (showMobileMenu.value) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
   }
 }
 
 const handleCommand = (command) => {
   switch (command) {
     case 'logout':
-      store.dispatch('logout'); // 執行登出操作
+      store.dispatch('logout')
       if (isAdminRoute.value) {
-        // 如果當前是管理員路由，登出後導引到管理員登入頁
-        router.push('/admin/login');
+        router.push('/admin/login')
       } else {
-        // 如果是普通用戶，登出後導引到普通登入頁
-        router.push('/login');
+        router.push('/login')
       }
-      break;
+      break
     case 'profile':
-      router.push('/profile'); // 導引到個人資料頁
-      break;
+      router.push('/profile')
+      break
     case 'orders':
-      router.push('/orders'); // 導引到訂單查詢頁
-      break;
+      router.push('/orders')
+      break
   }
-};
+}
 
-const handleScroll = () => {
-  // 獲取頁面高度
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
-  const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
-  const clientHeight = document.documentElement.clientHeight || window.innerHeight
-
-  // 如果捲動超過一半，顯示按鈕
-  showTopButton.value = scrollTop > (scrollHeight - clientHeight) / 2
+const handleLogout = () => {
+  store.dispatch('logout')
+  router.push('/login')
+  showMobileMenu.value = false
 }
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// Handlers
+const handleScroll = () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  isScrolled.value = scrollTop > 0
+  showBackToTop.value = scrollTop > 300
+}
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768
+  if (!isMobile.value) {
+    showMobileMenu.value = false
+    document.body.style.overflow = ''
+  }
+}
+
+// Lifecycle
 onMounted(() => {
+  handleResize()
+  window.addEventListener('scroll', handleScroll)
   window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('resize', handleResize)
 })
 </script>
 
-<style>
-:root {
-  --el-color-primary: #ff6b00;
-  --el-color-primary-light-3: #ff9900;
-  --el-color-primary-light-5: #ffb84d;
-  --el-color-primary-light-7: #ffd699;
-  --el-color-primary-light-9: #fff3e0;
-}
-</style>
-
 <style scoped>
-.app-container {
+/* 基礎設置 */
+.app-layout {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 管理後台樣式 */
-.admin-aside {
-  background-color: #2c1810;
-  height: 100vh;
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
 }
 
-.logo-container {
-  height: 60px;
+.admin-sidebar {
+  width: 240px;
+  background: #001529;
+  transition: all 0.3s;
+  position: fixed;
+  height: 100vh;
+  z-index: 1000;
+}
+
+.sidebar-closed {
+  width: 64px;
+}
+
+.admin-logo {
+  height: 64px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
   color: #fff;
-  background-color: #2c1810;
+  overflow: hidden;
 }
 
-.logo-container h1 {
-  font-size: 18px;
-  margin: 0;
+.admin-logo img {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
-.admin-menu {
-  border-right: none;
+.admin-main {
+  flex: 1;
+  margin-left: 240px;
+  transition: all 0.3s;
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+.main-expanded {
+  margin-left: 64px;
 }
 
 .admin-header {
-  background-color: #fff;
-  border-bottom: 1px solid #e6e6e6;
+  height: 64px;
+  background: #fff;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 20px;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 }
 
-.user-profile {
+.admin-user {
   display: flex;
   align-items: center;
+  gap: 8px;
   cursor: pointer;
 }
 
-.user-profile .el-icon {
-  margin-right: 8px;
+.admin-content {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.sidebar-toggle {
+  position: fixed;
+  bottom: 24px;
+  left: 200px;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+  z-index: 1001;
+}
+
+.sidebar-closed + .admin-main .sidebar-toggle {
+  left: 24px;
 }
 
 /* 前台樣式 */
-.client-header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.client-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.header-container {
+.client-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1000;
+  transition: box-shadow 0.3s;
+}
+
+.header-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.header-content {
   max-width: 1200px;
   margin: 0 auto;
+  height: 72px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
 }
 
-.logo-link {
-  text-decoration: none;
+.logo-area {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
+  text-decoration: none;
 }
 
 .logo-image {
-  width: 40px;  /* 設定 logo 寬度 */
-  height: 40px;  /* 設定 logo 高度 */
-  object-fit: cover;  /* 確保圖片比例正確 */
-  border-radius: 8px;  /* 添加圓角效果 */
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
 }
-
-
 
 .logo-text {
-  font-size: 28px;
-  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-primary {
   color: var(--el-color-primary);
-  margin-right: 8px;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1.2;
 }
 
-.logo-sub {
-  font-size: 16px;
+.text-secondary {
   color: #666;
+  font-size: 14px;
 }
 
-.main-menu {
-  border-bottom: none;
+.nav-desktop {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.router-link-active {
+  color: var(--el-color-primary);
 }
 
 .user-actions {
@@ -404,237 +536,186 @@ onUnmounted(() => {
   gap: 16px;
 }
 
-.cart-badge {
-  margin-right: 16px;
+.mobile-menu-btn {
+  cursor: pointer;
+  padding: 8px;
 }
 
-.el-main {
-  padding: 20px;
-  background-color: #fafafa;
+.mobile-menu {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* 頁尾樣式 */
-.site-footer {
-  background-color: #000000;
+.nav-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-user-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.client-main {
+  flex: 1;
+  background: #f5f7fa;
+  min-height: calc(100vh - 72px - 340px);
+}
+
+/* Footer 樣式 */
+.client-footer {
+  background: #001529;
+  padding: 48px 0 24px;
   color: #fff;
-  padding: 40px 0;
 }
 
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
-.footer-sections {
+.footer-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  margin-bottom: 40px;
+  gap: 48px;
+  margin-bottom: 48px;
 }
 
 .footer-section h3 {
+  color: var(--el-color-primary);
   font-size: 18px;
   margin-bottom: 16px;
-  color: var(--el-color-primary);
-}
-
-.footer-section p,
-.footer-section li {
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin-bottom: 8px;
 }
 
 .footer-section ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-section li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .footer-section a {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.3s;
 }
 
 .footer-section a:hover {
   color: var(--el-color-primary);
 }
 
+.social-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.social-links a {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.social-links a:hover {
+  background: var(--el-color-primary);
+}
+
 .footer-bottom {
   text-align: center;
-  padding-top: 20px;
+  padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.65);
 }
 
-.footer-bottom p {
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
-}
-
-header.el-header.client-header {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2),
-  0 15px 30px rgba(0, 0, 0, 0.1); /* 疊加兩層陰影 */
-}
-
-
-
-@media (max-width: 768px) {
-  .footer-sections {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-sections {
-    grid-template-columns: 1fr;
-  }
-}
-.top-button {
+/* 回到頂部按鈕 */
+.back-to-top {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background-color: var(--el-color-primary);
-  color: white;
+  bottom: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  background: var(--el-color-primary);
+  color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
 }
 
-.top-button:hover {
-  background-color: var(--el-color-primary-light-3);
+.back-to-top:hover {
+  background: var(--el-color-primary-light-3);
+  transform: translateY(-2px);
 }
 
-.top-button:active {
-  transform: scale(0.9);
+/* 動畫 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
 }
 
-/* 平板樣式 (768px ~ 1024px) */
-@media screen and (max-width: 1024px) {
-  .header-container {
-    padding: 0 16px;
-  }
-
-  .logo-text {
-    font-size: 24px;
-  }
-
-  .logo-sub {
-    font-size: 14px;
-  }
-
-  .user-actions {
-    gap: 8px;
-  }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
-/* 手機樣式 (< 768px) */
-@media screen and (max-width: 768px) {
-  .header-container {
-    position: relative;
-    padding: 0 12px;
-  }
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s;
+}
 
-  .mobile-menu-toggle {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-left: auto;
-    padding: 8px;
-  }
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
 
-  .main-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #fff;
-    flex-direction: column;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .main-menu.mobile-menu {
-    display: flex;
-  }
-
-  .el-menu--horizontal > .el-menu-item {
-    height: 50px;
-    line-height: 50px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .user-actions {
-    display: none;
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    padding: 8px 16px;
-    background-color: #fff;
-    border-top: 1px solid #f0f0f0;
-  }
-
-  .user-actions.mobile-user-actions {
-    display: flex;
-  }
-
-  .cart-badge {
-    margin-right: 0;
-    margin-bottom: 8px;
-  }
-
-  /* 調整購物車和會員中心按鈕樣式 */
-  .user-actions .el-button {
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 8px;
-  }
-
-  /* Footer 響應式調整 */
-  .footer-sections {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 0 16px;
-  }
-
-  .footer-section {
-    text-align: center;
-  }
-
-  /* 管理後台響應式調整 */
-  .admin-aside {
-    position: fixed;
-    z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .admin-aside.show {
-    transform: translateX(0);
-  }
-
-  .el-container .el-main {
-    margin-left: 0;
-    width: 100%;
+/* 響應式設計 */
+@media (max-width: 1200px) {
+  .header-content,
+  .footer-content {
+    max-width: 100%;
   }
 }
 
-/* 極小螢幕樣式 (< 480px) */
-@media screen and (max-width: 480px) {
-  .logo-text {
-    font-size: 20px;
+@media (max-width: 992px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
   }
+}
 
-  .logo-sub {
-    display: none;
+@media (max-width: 768px) {
+  .header-content {
+    height: 64px;
   }
 
   .logo-image {
@@ -642,76 +723,70 @@ header.el-header.client-header {
     height: 32px;
   }
 
-  .el-dropdown-menu {
-    min-width: 120px;
-  }
-}
-
-/* 隱藏桌機版選單開關按鈕 */
-.mobile-menu-toggle {
-  display: none;
-}
-
-@media screen and (max-width: 768px) {
-  .mobile-menu-toggle {
-    display: block;
-  }
-}
-
-/* 新增手機版 footer 樣式 */
-.mobile-footer {
-  display: none;
-}
-
-.contact-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background-color: var(--el-color-primary);
-  border-radius: 4px;
-  margin-top: 12px;
-  color: white;
-  text-decoration: none;
-}
-
-.contact-link .el-icon {
-  font-size: 18px;
-}
-
-@media screen and (max-width: 768px) {
-  .site-footer {
-    padding: 24px 0;
+  .text-primary {
+    font-size: 20px;
   }
 
-  .desktop-footer {
+  .text-secondary {
+    font-size: 12px;
+  }
+
+  .nav-desktop,
+  .user-actions {
     display: none;
   }
 
-  .mobile-footer {
+  .mobile-menu-btn {
     display: block;
-    padding: 0 16px;
   }
 
-  .mobile-footer .footer-section {
-    text-align: center;
-    margin-bottom: 20px;
+  .client-main {
+    min-height: calc(100vh - 64px - 340px);
   }
 
-  .mobile-footer h3 {
-    font-size: 16px;
-    margin-bottom: 12px;
+  /* 管理後台響應式 */
+  .admin-sidebar {
+    transform: translateX(-100%);
   }
 
-  .mobile-footer p {
-    margin-bottom: 8px;
+  .admin-sidebar.show {
+    transform: translateX(0);
   }
 
-  .footer-bottom {
-    padding-top: 16px;
-    margin-top: 16px;
+  .admin-main {
+    margin-left: 0 !important;
+  }
+
+  .sidebar-toggle {
+    display: none;
   }
 }
 
+@media (max-width: 576px) {
+  .header-content {
+    padding: 0 16px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .footer-section {
+    text-align: center;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .footer-section li {
+    justify-content: center;
+  }
+
+  .back-to-top {
+    bottom: 16px;
+    right: 16px;
+  }
+}
 </style>
