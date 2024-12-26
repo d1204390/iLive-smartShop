@@ -34,7 +34,7 @@
         </div>
         <div class="sort-box">
           <el-radio-group v-model="sortMethod" size="large">
-            <el-radio-button label="default">綜合</el-radio-button>
+            <el-radio-button label="default">預設</el-radio-button>
             <el-radio-button label="priceAsc">價格由低到高</el-radio-button>
             <el-radio-button label="priceDesc">價格由高到低</el-radio-button>
           </el-radio-group>
