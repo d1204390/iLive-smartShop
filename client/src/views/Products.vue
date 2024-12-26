@@ -233,7 +233,7 @@ const resetFilters = () => {
 const fetchProducts = async () => {
   try {
     loading.value = true
-    const response = await fetch('http://localhost:3000/api/products')
+    const response = await fetch('${import.meta.env.VITE_API_BASE_URL}/products')
     const result = await response.json()
     products.value = Array.isArray(result) ? result : (result.data || [])
   } catch (error) {
