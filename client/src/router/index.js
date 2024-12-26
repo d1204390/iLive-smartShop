@@ -1,4 +1,3 @@
-// client/src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
 
@@ -12,17 +11,20 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
-        component: () => import('../views/Login.vue')
+        component: () => import('../views/Login.vue'),
+        meta: { requiresGuest: true }
     },
     {
         path: '/register',
         name: 'Register',
-        component: () => import('../views/Register.vue')
+        component: () => import('../views/Register.vue'),
+        meta: { requiresGuest: true }
     },
     {
         path: '/forgot-password',
         name: 'ForgotPassword',
-        component: () => import('../views/ForgotPassword.vue')
+        component: () => import('../views/ForgotPassword.vue'),
+        meta: { requiresGuest: true }
     },
     {
         path: '/products',
@@ -60,7 +62,7 @@ const routes = [
     {
         path: '/products/:id',
         name: 'ProductDetail',
-        component:()=>import('../views/ProductDetail.vue'),
+        component: () => import('../views/ProductDetail.vue'),
     },
     {
         path: '/about',
@@ -71,6 +73,12 @@ const routes = [
         path: '/promotions',
         name: 'Promotions',
         component: () => import('../views/Promotions.vue'),
+    },
+    {
+        path: '/checkout',
+        name: 'Checkout',
+        component: () => import('../views/Checkout.vue'),
+        meta: { requiresAuth: true }
     },
 
     // 管理後台路由
@@ -111,12 +119,7 @@ const routes = [
                 path: 'sales-statistics',
                 name: 'SalesStatistics',
                 component: () => import('../views/admin/SalesStatistics.vue'),
-            },
-            {
-                path: '/checkout',
-                name: 'Checkout',
-                component: () => import('../views/Checkout.vue'),
-                meta: { requiresAuth: true }
+                meta: { requiresAdmin: true }
             }
         ]
     }
@@ -132,8 +135,28 @@ router.beforeEach((to, from, next) => {
     const isAuthenticated = store.state.auth.token
     const isAdmin = store.state.auth.user?.role === 'admin'
 
+    // 檢查是否訪問僅限訪客頁面（登入、註冊等）
+    if (isAuthenticated) {
+        // 如果是管理員，應導向管理後台首頁
+        if (to.meta.requiresGuest && isAdmin) {
+            next('/admin/dashboard')
+            return
+        }
+        // 如果是一般用戶，導向首頁
+        if (to.meta.requiresGuest) {
+            next('/')
+            return
+        }
+    }
+
     // 檢查是否是管理後台路由
     if (to.path.startsWith('/admin')) {
+        // 一般用戶（非管理員）登入後訪問管理員登入頁面，重定向到首頁
+        if (to.path === '/admin/login' && isAuthenticated && !isAdmin) {
+            next('/')
+            return
+        }
+
         if (to.path === '/admin/login') {
             // 已登入的管理員不能再訪問登入頁
             if (isAuthenticated && isAdmin) {
@@ -148,12 +171,14 @@ router.beforeEach((to, from, next) => {
             next()
         }
     } else {
-        // 一般用戶路由檢查
+        // 檢查是否訪問需要登入的頁面
         if (to.meta.requiresAuth && !isAuthenticated) {
             next('/login')
-        } else {
-            next()
+            return
         }
+
+        // 其他情況放行
+        next()
     }
 })
 
