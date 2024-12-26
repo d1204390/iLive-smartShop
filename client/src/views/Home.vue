@@ -263,7 +263,7 @@ const features = ref([
 
 const fetchProducts = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/products')
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products`)
     const result = await response.json()
     const allProducts = Array.isArray(result) ? result : (result.data || [])
     products.value = allProducts
