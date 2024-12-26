@@ -183,6 +183,18 @@
       </el-container>
     </template>
 
+    <div
+        v-if="showTopButton"
+        class="top-button"
+        @click="scrollToTop"
+    >
+      TOP
+    </div>
+  </div>
+</template>
+
+
+
 <script setup>
 import { computed } from 'vue'
 import { ref, onMounted, onUnmounted } from 'vue'
