@@ -91,7 +91,7 @@ const store = createStore({
         // 登入
         async login({ commit }, credentials) {
             try {
-                const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, credentials);
+                const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, credentials);
                 commit('SET_AUTH', { token: data.token, user: data.user });
                 return data;
             } catch (error) {
