@@ -487,8 +487,11 @@ onUnmounted(() => {
 }
 
 .client-header {
-  position: sticky;
+  position: fixed; /* 改成 fixed */
   top: 0;
+  left: 0;    /* 新增 */
+  right: 0;   /* 新增 */
+  width: 100%; /* 新增 */
   background: #fff;
   z-index: 1000;
   transition: box-shadow 0.3s;
@@ -593,6 +596,7 @@ onUnmounted(() => {
 }
 
 .client-main {
+  padding-top: 72px; /* header 的高度 */
   flex: 1;
   background: #f5f7fa;
   min-height: calc(100vh - 72px - 340px);
@@ -766,6 +770,7 @@ onUnmounted(() => {
   }
 
   .client-main {
+    padding-top: 64px; /* 行動版 header 的高度 */
     min-height: calc(100vh - 64px - 340px);
   }
 
