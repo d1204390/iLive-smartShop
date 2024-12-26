@@ -95,23 +95,118 @@ npm run dev
 
 ## 部署說明
 
-1. 前端部署
-```bash
-cd client
-npm run build
-```
+# 部署開發流程
 
-2. 後端部署
-```bash
-cd server
-npm run build
-```
+## 前置準備
+1. **準備專案結構**
+    - `client/`: 前端專案
+    - `server/`: 後端專案
+
+2. **環境變數設置**
+    - 在 `server/` 資料夾下建立 `.env` 文件，包含以下內容：
+      ```env
+      MONGO_URI=mongodb+srv://<username>:<password>@<cluster>/<db_name>?retryWrites=true&w=majority
+      JWT_SECRET=your-super-secret-key
+      JWT_EXPIRE=24h
+      EMAIL_USER=your-email@gmail.com
+      EMAIL_PASS=your-email-password
+      ```
+    - 在 `client/` 資料夾下建立 `.env.production` 文件，包含以下內容：
+      ```env
+      VITE_API_BASE_URL=https://<your-backend-service>.onrender.com/api
+      ```
+
+3. **新增 `.gitignore` 文件**
+    - 確保環境變數檔案被忽略：
+      ```
+      **/node_modules
+      client/dist
+      server/.env
+      ```
+
+## 部屬流程
+
+### 部屬後端
+1. **Render 平台設置**
+    - 登入 [Render](https://render.com/) 並建立新服務：
+        - 選擇 **Web Service**。
+        - 設定名稱，例如 `ilive-backend`。
+        - 指定後端的 Git 儲存庫。
+        - 選擇 Branch，例如 `master`。
+        - 填寫 Root Directory：
+          ```
+          server
+          ```
+        - Build Command：
+          ```
+          npm install
+          ```
+        - Start Command：
+          ```
+          npm start
+          ```
+
+2. **檢查日誌**
+    - 在 Render 的 **Logs** 頁面確認是否啟動成功。
+    - 確認服務已在指定的 URL 運行，例如：https://ilive-backend.onrender.com。
+
+### 部屬前端
+1. **Render 平台設置**
+    - 登入 [Render](https://render.com/) 並建立新服務：
+        - 選擇 **Web Service**。
+        - 設定名稱，例如 `ilive-frontend`。
+        - 指定前端的 Git 儲存庫。
+        - 選擇 Branch，例如 `master`。
+        - 填寫 Root Directory：
+          ```
+          client
+          ```
+        - Build Command：
+          ```
+          npm install && npm run build
+          ```
+        - Start Command：
+          ```
+          serve -s dist
+          ```
+
+2. **檢查日誌**
+    - 在 Render 的 **Logs** 頁面確認是否啟動成功。
+    - 確認服務已在指定的 URL 運行，例如：https://ilive-frontend.onrender.com。
+
+## 測試與驗證
+1. **後端測試**
+    - 使用 Postman 測試 API。
+    - 測試例如 `/api/auth/register`、`/api/products` 等路徑。
+
+2. **前端驗證**
+    - 開啟前端部署的 URL，驗證功能是否正常。
+    - 確認前端是否成功請求後端 API。
+
+## 注意事項
+- 確保環境變數中的機密資訊（如密碼和金鑰）正確無誤。
+- Render 部屬時，若有更改設定或程式碼，需重新觸發部屬。
+    - 點選 `Deploy latest commit` 或 `Clear build cache & deploy`。
+- 確保 `.gitignore` 文件正確設置，避免環境變數檔案被提交到 Git。
+
+## 常見問題排解
+- **日誌中出現錯誤訊息**：
+    - 檢查環境變數是否正確設置。
+    - 確認 Build Command 和 Start Command 是否正確。
+
+- **前端請求後端失敗**：
+    - 確保 `.env.production` 中的 `VITE_API_BASE_URL` 指向正確的後端 URL。
+    - 檢查 CORS 設定是否允許跨域請求。
+
+- **部署後更新未生效**：
+    - 確保最新的程式碼已推送到 Git 儲存庫。
+    - 使用 Render 的 `Clear build cache & deploy` 重新部屬。
+
 
 ## 開發團隊
 - 前端開發：Me
 - 後端開發：Me
 - UI/UX 設計：ME
 - AI工具：Claude Sonnet3.5
-
 ## 版本歷史
 - v0.0.0 (2024-12-26) - 初始版本

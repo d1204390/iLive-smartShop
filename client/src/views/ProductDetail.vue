@@ -161,7 +161,7 @@ const fetchProductDetail = async () => {
 
   try {
     loading.value = true
-    const response = await fetch(`http://localhost:3000/api/products/${productId}`)
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/${productId}`)
     const result = await response.json()
 
     if (!result.success && !result._id) {
