@@ -171,7 +171,10 @@
                   </router-link>
                 </template>
                 <template v-else>
-                  <router-link to="/cart" @click="showMobileMenu = false">
+                  <router-link to="/cart" @click="() => {
+                    showMobileMenu = false
+                    unlockScroll()
+                    }">
                     <el-button block>
                       <el-icon><ShoppingCart /></el-icon>
                       購物車
