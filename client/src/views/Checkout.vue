@@ -96,6 +96,12 @@
                 <span class="total-amount">NT$ {{ totalAmount.toLocaleString() }}</span>
               </div>
             </el-card>
+            <router-link to="/cart">
+              <el-button>
+                返回修改
+              </el-button>
+            </router-link>
+
 
             <el-button
                 type="primary"
