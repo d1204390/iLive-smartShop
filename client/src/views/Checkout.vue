@@ -243,11 +243,12 @@
 
             <!-- 表單按鈕 -->
             <div class="form-actions">
-              <el-button
-                  @click="isConfirmed = false"
-              >
-                返回修改商品
-              </el-button>
+              <router-link to="/cart">
+                <el-button>
+                  返回修改商品
+                </el-button>
+              </router-link>
+
               <el-button
                   type="primary"
                   native-type="submit"
