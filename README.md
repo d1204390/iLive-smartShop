@@ -105,9 +105,9 @@ npm run dev
 2. **環境變數設置**
     - 在 `server/` 資料夾下建立 `.env` 文件，包含以下內容：
       ```env
-      MONGO_URI=mongodb+srv://<username>:<password>@<cluster>/<db_name>?retryWrites=true&w=majority
-      JWT_SECRET=your-super-secret-key
-      JWT_EXPIRE=24h
+      MONGO_URI=your-code
+      JWT_SECRET=your-code
+      JWT_EXPIRE=your-code
       EMAIL_USER=your-email@gmail.com
       EMAIL_PASS=your-email-password
       ```
