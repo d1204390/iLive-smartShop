@@ -208,5 +208,3 @@ npm run dev
 - 後端開發：Me
 - UI/UX 設計：ME
 - AI工具：Claude Sonnet3.5
-## 版本歷史
-- v0.0.0 (2024-12-26) - 初始版本
